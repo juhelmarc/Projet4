@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.booking.BookingActivity">
+
+
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/title_margin"
+        android:layout_marginBottom="@dimen/title_margin"
+        android:hint="@string/booking_activity"
+        android:textSize="@dimen/title_size"
+        android:gravity="center"
+        android:textStyle="italic"
+        android:background="@color/design_default_color_primary"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+    <Button
+        android:id="@+id/datePickerButton"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:text="@string/chose_date"
+        android:textSize="@dimen/text_size"
+        android:gravity="center"
+        android:textColor="@color/gray"
+        android:layout_marginTop="@dimen/title_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView"/>
+
+    <EditText
+        android:id="@+id/hour"
+        android:layout_width="@dimen/edit_text_width"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/edit_text_margin"
+        android:gravity="center"
+        android:inputType="datetime"
+        android:hint="@string/chose_hour"
+        android:textColor="@color/gray"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/datePickerButton" />
+
+    <EditText
+        android:id="@+id/duration"
+        android:layout_width="@dimen/edit_text_width"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/edit_text_margin"
+        android:gravity="center"
+        android:inputType="datetime"
+        android:hint="@string/chose_duration"
+        android:textColor="@color/gray"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/hour" />
+    <TextView
+        android:id="@+id/resum_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/edit_text_margin"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/duration" />
+
+    <MultiAutoCompleteTextView
+        android:id="@+id/mail_autocomplete"
+        android:layout_width="@dimen/edit_text_width"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/edit_text_margin"
+        android:gravity="center"
+        android:hint="@string/chose_mail"
+        android:textColor="@color/gray"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/resum_date"
+        tools:ignore="LabelFor" />
+
+    <EditText
+        android:id="@+id/subject"
+        android:layout_width="@dimen/edit_text_width"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/edit_text_margin"
+        android:gravity="center"
+        android:inputType="text"
+        android:hint="@string/type_subject"
+        android:textColor="@color/gray"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mail_autocomplete" />
+
+    <Spinner
+        android:id="@+id/room_spinner"
+        android:layout_width="@dimen/edit_text_width"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/edit_text_margin"
+        android:gravity="center"
+        android:hint="@string/chose_place"
+        android:textColor="@color/gray"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/subject"
+        tools:ignore="LabelFor" />
+
+    <Button
+        android:id="@+id/book"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/title_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/room_spinner"
+        android:text="@string/book_meeting"
+        />
+
+
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
