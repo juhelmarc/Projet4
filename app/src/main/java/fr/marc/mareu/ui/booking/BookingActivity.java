@@ -10,8 +10,6 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -61,7 +59,11 @@ public class BookingActivity extends AppCompatActivity implements AdapterView.On
     @BindView( R.id.book )
     Button mBookButton;
 
+    private Meeting meetingToBook;
     private MeetingApiService mApiService;
+    private String[] userList = {"alexandre@mareu.com", "toto@mareu.com", "benoit@mareu.com", "qsdqsd@mareu.com", "cdsf@mareu.com", "zer@mareu.com", "oper@mareu.com"};
+
+    private String[] meetingRoomList = {"Room A ", "Room B ", "Room C","Room D", "Room E", "Room F", "Room G", "Room H", "Room I", "Room J" };
 
     private Long currentDatePicker;
     private Long endCurrentDate;
@@ -70,6 +72,9 @@ public class BookingActivity extends AppCompatActivity implements AdapterView.On
     private Long endDatePickedMilli;
     private Long duration;
 
+    private String currentDateFormated;
+    private String currentTimeFormated;
+    private String endCurrentTimeFormated;
     private String datePickedFormated;
     private String timePickedFormated;
     private String endTimePickedFormated;
@@ -82,40 +87,32 @@ public class BookingActivity extends AppCompatActivity implements AdapterView.On
         setContentView( R.layout.activity_booking );
         ButterKnife.bind( this );
         mApiService = DI.getMeetingApiService();
-
-        mBookButton.setEnabled( false );
-        initDatePicker();
-        initMailMultiAutoComplete();
-        initMeetingRoomSpinner();
-    }
-
-    public void initMailMultiAutoComplete() {
         //userList = mApiService.getUserList();
-        String[] userList = {"alexandre@mareu.com", "toto@mareu.com", "benoit@mareu.com", "qsdqsd@mareu.com", "cdsf@mareu.com", "zer@mareu.com", "oper@mareu.com"};
-        ArrayAdapter userListAdapter = new ArrayAdapter( this, android.R.layout.simple_list_item_1, userList );
-        mMail.setAdapter( userListAdapter );
-        mMail.setTokenizer( new MultiAutoCompleteTextView.CommaTokenizer() );
-        mMail.setThreshold( 1 );
-    }
-    public void initMeetingRoomSpinner () {
-        String[] meetingRoomList = {"Room A ", "Room B ", "Room C","Room D", "Room E", "Room F", "Room G", "Room H", "Room I", "Room J" };
-        ArrayAdapter<CharSequence> meetingRoomListAdapter = new ArrayAdapter( this, android.R.layout.simple_spinner_item, meetingRoomList );
-        meetingRoomListAdapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
-        mMeetingRoom.setAdapter( meetingRoomListAdapter );
-        mMeetingRoom.setOnItemSelectedListener( this );
-    }
 
-    public void initDatePicker() {
+
+//
+       // ArrayAdapter userListAdapter = new ArrayAdapter( this, android.R.layout.simple_list_item_1, userList );
+       // mMail.setAdapter( userListAdapter );
+       // mMail.setTokenizer( new MultiAutoCompleteTextView.CommaTokenizer() );
+       // mMail.setThreshold( 1 );
+       // // MeetingRoom spinner
+       // ArrayAdapter<CharSequence> meetingRoomListAdapter = new ArrayAdapter( this, android.R.layout.simple_spinner_item, meetingRoomList );
+       // meetingRoomListAdapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
+       // mMeetingRoom.setAdapter( meetingRoomListAdapter );
+       // mMeetingRoom.setOnItemSelectedListener( this );
+
+
+
         currentDatePicker = new Date().getTime();
-        String currentDateFormated = formatDate( currentDatePicker );
-        //mDateButton.setText( currentDateFormated );
-        String currentTimeFormated = formatHour( currentDatePicker );
-        // mHour.setText( currentTimeFormated );
+        currentDateFormated = formatDate( currentDatePicker );
+        mDateButton.setText( currentDateFormated );
+        currentTimeFormated = formatHour( currentDatePicker );
+        mHour.setText( currentTimeFormated );
         // Default value 45 min
         mDuration.setText("45");
         duration = Long.parseLong( mDuration.getText().toString() ) * 60L * 1000L;
         endCurrentDate = currentDatePicker + duration;
-        String endCurrentTimeFormated = formatHour( endCurrentDate );
+        endCurrentTimeFormated = formatHour( endCurrentDate );
         mResumDate.setText( "Date : " + currentDateFormated + " Start : " + currentTimeFormated + " End : " + endCurrentTimeFormated );
 
         Calendar calendar = Calendar.getInstance();
@@ -138,6 +135,7 @@ public class BookingActivity extends AppCompatActivity implements AdapterView.On
                         calendar.set(Calendar.YEAR, view.getYear());
                         //récupérer la date de clalendar en milliseconde
                         datePickedMilli = calendar.getTimeInMillis() ;
+                        duration = Long.parseLong( mDuration.getText().toString()  ) * 60 * 1000;
                         endDatePickedMilli = datePickedMilli + duration ;
 
                         datePickedFormated = formatDate( datePickedMilli );
@@ -155,16 +153,6 @@ public class BookingActivity extends AppCompatActivity implements AdapterView.On
                 mDatePickerDialog.show();
             }
         } );
-        mDateButton.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) { }
-            @Override
-            public void afterTextChanged(Editable s) {
-                mBookButton.setEnabled(s.length() > 1);
-            }
-        });;
         mHour.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -175,6 +163,7 @@ public class BookingActivity extends AppCompatActivity implements AdapterView.On
                         calendar.set(Calendar.HOUR_OF_DAY, view.getHour());
                         calendar.set(Calendar.MINUTE, view.getMinute());
                         datePickedMilli = calendar.getTimeInMillis();
+                        duration = Long.parseLong( mDuration.getText().toString()  ) * 60 * 1000;
                         endDatePickedMilli = datePickedMilli + duration;
                         timePickedFormated = formatHour( datePickedMilli );
                         endTimePickedFormated = formatHour(endDatePickedMilli);
@@ -200,6 +189,10 @@ public class BookingActivity extends AppCompatActivity implements AdapterView.On
             }
 
         } );
+
+
+
+
     }
     // method for format our dateMillisecond in string with SimpleDateFormat
     public String formatDate(Long dateMilli) {
@@ -212,6 +205,7 @@ public class BookingActivity extends AppCompatActivity implements AdapterView.On
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format, Locale.FRANCE);
         return simpleDateFormat.format(timeMilli);
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -222,6 +216,8 @@ public class BookingActivity extends AppCompatActivity implements AdapterView.On
         }
         return super.onOptionsItemSelected( item );
     }
+
+
     //TODO récupérer les valeurs du date picker et set cela au bouton (avec par défaut la date du jour)
     //TODO ajouter le timePicker et transformer toutes les données en Long date
 
@@ -231,14 +227,14 @@ public class BookingActivity extends AppCompatActivity implements AdapterView.On
     public void setMeetingToBook() {
         //TODO :Enable when all input fields are complete
         Calendar calendar = Calendar.getInstance();
-      Meeting meetingToBook = new Meeting(
-              datePickedMilli,
-              endDatePickedMilli,
-              mMeetingRoom.getSelectedItem().toString(),
-              mSubject.getText().toString(),
-              mMail.getText().toString()
-      );
-        mApiService.bookMeeting( meetingToBook );
+        meetingToBook = new Meeting(
+                datePickedMilli,
+                endDatePickedMilli,
+                mMeetingRoom.getSelectedItem().toString(),
+                mSubject.getText().toString(),
+                mMail.getText().toString()
+        );
+        mApiService.bookMeeting(meetingToBook);
         Toast.makeText( this,  "MeetingList = " + mApiService.getMeetingList().size(), Toast.LENGTH_SHORT ).show();
 
         finish();
