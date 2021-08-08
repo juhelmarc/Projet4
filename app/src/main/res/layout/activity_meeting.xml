@@ -20,7 +20,7 @@
         app:title="@string/app_name"/>
 
 
-
+<!--ajouter le bouton d'action de filtrage autrement / 3 actions : click sur une salle pop up avec spinner pour salle de réu même chose pour date et 3 em pour clear les filtres-->
     <ImageView
         android:id="@+id/filterView"
         android:layout_width="wrap_content"

@@ -30,8 +30,8 @@ public class MyMeetingRecyclerViewAdapter extends RecyclerView.Adapter<MyMeeting
 
     private final List<Meeting> mMeetings;
     private int day;
-    private Long date;
-    private Long endDate;
+    private Date date;
+    private Date endDate;
     //ImageView day
     int[]  imagesOfDays = {R.drawable.day_lundi, R.drawable.day_mardi, R.drawable.day_mercredi, R.drawable.day_jeudi, R.drawable.day_vendredi};
 

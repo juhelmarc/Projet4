@@ -9,8 +9,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MaReu">
-        <activity android:name=".ui.booking.BookingActivity"></activity>
-        <activity android:name=".ui.meeting.MeetingActivity">
+        <activity android:name=".ui.booking.BookingActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".ui.meeting.MeetingActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

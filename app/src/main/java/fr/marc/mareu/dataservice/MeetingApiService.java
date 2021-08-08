@@ -3,7 +3,7 @@ package fr.marc.mareu.dataservice;
 import java.util.List;
 
 import fr.marc.mareu.model.Meeting;
-import fr.marc.mareu.model.Users;
+import fr.marc.mareu.model.User;
 
 public interface MeetingApiService {
 
@@ -13,6 +13,6 @@ public interface MeetingApiService {
 
     void bookMeeting(Meeting meeting);
 
-    List<Users> getUserList();
+    List<User> getUserList();
 
 }

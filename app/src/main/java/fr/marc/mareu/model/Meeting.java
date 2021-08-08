@@ -1,11 +1,13 @@
 package fr.marc.mareu.model;
 
+import java.util.Date;
+
 public class Meeting {
     //todo model date (à mettre en place) faire la verif au moment du booking
     //todo regarder pour les mails l'autocomplete il faut un model users pour le faire (pour proposer une liste de name à selectionner)
-    private Long date;
+    private Date date;
 
-    private Long endDate;
+    private Date endDate;
 
     private String place;
 
@@ -14,7 +16,8 @@ public class Meeting {
     private String mailsList;
 
     //todo créer un modèle users et mettre firstname et email // remplacer year, month, day, hour à remplacer par date
-    public Meeting (long date, long endDate, String room, String subjectMeeting, String mailsList) {
+    //todo utiliser date plutôt que long
+    public Meeting (Date date, Date endDate, String room, String subjectMeeting, String mailsList) {
         this.date = date;
         this.endDate = date;
         this.place = room;
@@ -22,18 +25,18 @@ public class Meeting {
         this.mailsList = mailsList;
 
     }
-    public Long getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(Long date) {
+    public void setDate(Date date) {
         this.date = date;
     }
-    public Long getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Long endDate) {
+    public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 

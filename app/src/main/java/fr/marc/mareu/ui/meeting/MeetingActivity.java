@@ -65,6 +65,7 @@ public class MeetingActivity extends AppCompatActivity {
         //startActivity(intent);
 
     }
+    //Todo : récupérer une référence de MyMeetingRecuclerViewAdapter + .notifyDataSetChange et ajouter la nouvelle liste dans l'adapter. Créer une fonction pour insérer une nouvelle liste
     private void initList() {
         mMeetingList = mApiService.getMeetingList();
         mRecyclerView.setAdapter( new MyMeetingRecyclerViewAdapter( mMeetingList ) );

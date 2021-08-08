@@ -1,6 +1,6 @@
 package fr.marc.mareu.model;
 
-public class Users {
+public class User {
 
 
     private String firstName;
@@ -9,7 +9,7 @@ public class Users {
 
 
 
-    public Users(String firstName, String eMail) {
+    public User(String firstName, String eMail) {
         this.firstName = firstName;
         this.eMail = eMail;
     }
