@@ -1,8 +1,10 @@
 package fr.marc.mareu.dataservice;
 
+import java.util.Date;
 import java.util.List;
 
 import fr.marc.mareu.model.Meeting;
+import fr.marc.mareu.model.Room;
 import fr.marc.mareu.model.User;
 
 public interface MeetingApiService {
@@ -14,5 +16,19 @@ public interface MeetingApiService {
     void bookMeeting(Meeting meeting);
 
     List<User> getUserList();
+
+    List<String> getEmailInThisUserList(List<User> thisUserList);
+
+    List<User> getUserListMeeting (String emailList);
+
+    List<Meeting> getMeetingListFiltered();
+
+    List<Room> getRoomList();
+
+    List <String> getRoomNameList();
+
+    void applyRoomFilter(int index);
+
+    void applyDateFilter(Date date);
 
 }

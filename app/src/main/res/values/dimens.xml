@@ -12,7 +12,7 @@
     <dimen name="text_view_width">120dp</dimen>
     <dimen name="divider_margin">8dp</dimen>
     <dimen name="text_view_width_email">120dp</dimen>
-    <dimen name="edit_text_width_email">@dimen/wrap_content</dimen>
+    <dimen name="edit_text_width_email">165dp</dimen>
 
 
 </resources>

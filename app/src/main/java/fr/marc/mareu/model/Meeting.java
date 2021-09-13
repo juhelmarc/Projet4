@@ -1,28 +1,34 @@
 package fr.marc.mareu.model;
 
 import java.util.Date;
+import java.util.List;
 
 public class Meeting {
-    //todo model date (à mettre en place) faire la verif au moment du booking
-    //todo regarder pour les mails l'autocomplete il faut un model users pour le faire (pour proposer une liste de name à selectionner)
+
     private Date date;
 
     private Date endDate;
 
-    private String place;
+    private Room room;
 
     private String subjectMeeting;
 
-    private String mailsList;
+    private List<User> user;
 
-    //todo créer un modèle users et mettre firstname et email // remplacer year, month, day, hour à remplacer par date
-    //todo utiliser date plutôt que long
-    public Meeting (Date date, Date endDate, String room, String subjectMeeting, String mailsList) {
+    private Boolean isFiltered;
+
+    //Créer une classe Room / pas de string
+    //utiliser également User
+
+
+
+    public Meeting (Date date, Date endDate, Room room, String subjectMeeting, List<User> user, Boolean isFiltered) {
         this.date = date;
-        this.endDate = date;
-        this.place = room;
+        this.endDate = endDate;
+        this.room = room;
         this.subjectMeeting = subjectMeeting;
-        this.mailsList = mailsList;
+        this.user = user;
+        this.isFiltered = isFiltered;
 
     }
     public Date getDate() {
@@ -40,20 +46,20 @@ public class Meeting {
         this.endDate = endDate;
     }
 
-    public String getMailsList() {
-        return mailsList;
+    public List<User> getUser() {
+        return user;
     }
 
-    public void setMailsList(String mailsList) {
-        this.mailsList = mailsList;
+    public void setUser(List<User> user) {
+        this.user = user;
     }
 
-    public String getPlace() {
-        return place;
+    public Room getRoom() {
+        return room;
     }
 
-    public void setPlace(String place) {
-        this.place = place;
+    public void setPlace(Room room) {
+        this.room = room;
     }
 
     public String getSubjectMeeting() {
@@ -64,13 +70,12 @@ public class Meeting {
         this.subjectMeeting = subjectMeeting;
     }
 
-    public String getMails() {
-        return mailsList;
+    public Boolean getFiltered() {
+        return isFiltered;
     }
 
-    public void setMails(String mails) {
-        this.mailsList = mails;
+    public void setFiltered(Boolean filtered) {
+        isFiltered = filtered;
     }
-
 
 }

@@ -63,7 +63,7 @@
                 android:padding="16dp">
 
                 <EditText
-                    android:id="@+id/datePickerButton"
+                    android:id="@+id/datePicker"
                     android:layout_width="@dimen/edit_text_width"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
@@ -84,9 +84,9 @@
                     android:layout_marginStart="@dimen/edit_text_margin"
                     android:text="@string/Chose_a_date"
                     android:textSize="@dimen/text_size"
-                    app:layout_constraintBottom_toBottomOf="@+id/datePickerButton"
+                    app:layout_constraintBottom_toBottomOf="@+id/datePicker"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/datePickerButton" />
+                    app:layout_constraintTop_toTopOf="@+id/datePicker" />
 
                 <EditText
                     android:id="@+id/hour"
@@ -100,7 +100,7 @@
                     android:textColor="@color/gray"
                     android:textSize="@dimen/text_size"
                     app:layout_constraintStart_toEndOf="@+id/text2"
-                    app:layout_constraintTop_toBottomOf="@+id/datePickerButton" />
+                    app:layout_constraintTop_toBottomOf="@+id/datePicker" />
 
                 <TextView
                     android:id="@+id/text2"
@@ -114,7 +114,7 @@
                     app:layout_constraintTop_toTopOf="@+id/hour" />
 
                 <EditText
-                    android:id="@+id/duration"
+                    android:id="@+id/end_hour"
                     android:layout_width="@dimen/edit_text_width"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
@@ -135,9 +135,9 @@
                     android:layout_marginStart="@dimen/edit_text_margin"
                     android:text="@string/duration_meeting"
                     android:textSize="@dimen/text_size"
-                    app:layout_constraintBottom_toBottomOf="@+id/duration"
+                    app:layout_constraintBottom_toBottomOf="@+id/end_hour"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/duration" />
+                    app:layout_constraintTop_toTopOf="@+id/end_hour" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -196,18 +196,21 @@
                 app:layout_constraintTop_toBottomOf="@+id/divider3">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="395dp"
-                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:padding="16dp">
 
                     <MultiAutoCompleteTextView
                         android:id="@+id/mail_autocomplete"
-                        android:layout_width="@dimen/edit_text_width"
+                        android:layout_width="@dimen/edit_text_width_email"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginTop="@dimen/edit_text_margin"
+                        android:fadeScrollbars="false"
                         android:gravity="left"
                         android:hint="@string/chose_mail"
+                        android:includeFontPadding="false"
+                        android:isScrollContainer="false"
                         android:textColor="@color/gray"
                         android:textSize="@dimen/text_size"
                         app:layout_constraintStart_toEndOf="@+id/text4"

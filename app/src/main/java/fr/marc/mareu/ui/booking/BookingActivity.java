@@ -10,6 +10,8 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -25,6 +27,7 @@ import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -37,16 +40,17 @@ import fr.marc.mareu.DI.DI;
 import fr.marc.mareu.R;
 import fr.marc.mareu.dataservice.MeetingApiService;
 import fr.marc.mareu.model.Meeting;
+import fr.marc.mareu.model.Room;
 import fr.marc.mareu.model.User;
 
 public class BookingActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    @BindView(R.id.datePickerButton)
-    EditText mDateButton;
+    @BindView(R.id.datePicker)
+    EditText mDate;
     @BindView( R.id.hour )
     EditText mHour;
-    @BindView( R.id.duration )
-    EditText mDuration;
+    @BindView( R.id.end_hour )
+    EditText mEndDate;
     @BindView( R.id.resum_date )
     TextView mResumDate;
     @BindView( R.id.mail_autocomplete )
@@ -57,25 +61,10 @@ public class BookingActivity extends AppCompatActivity implements AdapterView.On
     EditText mSubject;
     @BindView( R.id.book )
     Button mBookButton;
-    //@BindView( R.id.text1 )
-    //Button mText1;
-    //@BindView( R.id.text2 )
-    //Button mText2;
-    //@BindView( R.id.text3)
-    //Button mText3;
-    //@BindView( R.id.text4 )
-    //Button mText4;
-    //@BindView( R.id.text5 )
-    //Button mText5;
-    //@BindView( R.id.text6 )
-    //Button mText6;
 
     private MeetingApiService mApiService;
 
-    private Long currentDatePicker;
-    private Long endCurrentDate;
-
-    private Long datePickedMilli;
+    private Long startDatePickedMilli;
     private Long endDatePickedMilli;
     private Long duration;
 
@@ -83,39 +72,73 @@ public class BookingActivity extends AppCompatActivity implements AdapterView.On
     private String timePickedFormated;
     private String endTimePickedFormated;
 
+    private List<String> meetingRoomList;
+    private List<User> userList;
+
     private DatePickerDialog mDatePickerDialog;
+
+    private Boolean dateEdited;
+    private Boolean hourEdited;
+    private Boolean durationEdited;
+    private Boolean mailEdited;
+    private Boolean subjectEdited;
+    private Boolean roomIsTaken;
+    private Boolean crenelIsFree;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_booking );
         ButterKnife.bind( this );
+
         mApiService = DI.getMeetingApiService();
 
-        //mBookButton.setEnabled( false );
+        mSubject.addTextChangedListener( new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                subjectEdited = true;
+            }
+        } );
         initDatePicker();
         initMailMultiAutoComplete();
         initMeetingRoomSpinner();
+
     }
 
     public void initMailMultiAutoComplete() {
-
-       // String[] userList = {"alexandre@mareu.com", "toto@mareu.com", "benoit@mareu.com", "qsdqsd@mareu.com", "cdsf@mareu.com", "zer@mareu.com", "oper@mareu.com"};
-       // ArrayAdapter userListAdapter = new ArrayAdapter( this, android.R.layout.simple_list_item_1, userList );
         List<User> userList = mApiService.getUserList();
-        List<String> emailList = new ArrayList<>();
-        for (User users : userList){
-            emailList.add(users.geteMail());
-        }
+        List<String> emailList = mApiService.getEmailInThisUserList( userList );
         ArrayAdapter emailListAdapter = new ArrayAdapter( this, android.R.layout.simple_list_item_1, emailList );
         mMail.setAdapter( emailListAdapter);
-        mMail.setTokenizer( new MultiAutoCompleteTextView.CommaTokenizer() );
+        mMail.setTokenizer( new MultiAutoCompleteTextView.CommaTokenizer());
         mMail.setThreshold( 1 );
-    }
-    public void initMeetingRoomSpinner () {
 
-        String[] meetingRoomList = {"Room A ", "Room B ", "Room C","Room D", "Room E", "Room F", "Room G", "Room H", "Room I", "Room J" };
-        ArrayAdapter<CharSequence> meetingRoomListAdapter = new ArrayAdapter( this, android.R.layout.simple_spinner_item, meetingRoomList );
+        mMail.addTextChangedListener( new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                mailEdited = true;
+            }
+        } );
+
+    }
+
+    public void initMeetingRoomSpinner () {
+        meetingRoomList = mApiService.getRoomNameList();
+        //meetingRoomList = new String[]{"Chose room", "Meeting room A", "Meeting room B", "Meeting room C", "Meeting room D", "Meeting room E", "Meeting room F", "Meeting room G", "Meeting room H", "Meeting room I", "Meeting room J"};
+
+        ArrayAdapter meetingRoomListAdapter = new ArrayAdapter( this, android.R.layout.simple_spinner_item, meetingRoomList );
         meetingRoomListAdapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
         mMeetingRoom.setAdapter( meetingRoomListAdapter );
         mMeetingRoom.setOnItemSelectedListener( this );
@@ -123,27 +146,18 @@ public class BookingActivity extends AppCompatActivity implements AdapterView.On
 
     public void initDatePicker() {
 
-        //currentDatePicker = new Date().getTime();
-        //String currentDateFormated = formatDate( currentDatePicker );
-        //mDateButton.setText( currentDateFormated );
-        //String currentTimeFormated = formatHour( currentDatePicker );
-        //mHour.setText( currentTimeFormated );
-        //Default value 45 min
-        mDuration.setText("45");
-        duration = Long.parseLong( mDuration.getText().toString() ) * 60L * 1000L;
-        //endCurrentDate = currentDatePicker + duration;
-        //String endCurrentTimeFormated = formatHour( endCurrentDate );
-        //String textResumDate = "Date : " + currentDateFormated + " Start : " + currentTimeFormated + " End : " + endCurrentTimeFormated;
-        //mResumDate.setText( textResumDate);
-
         Calendar calendar = Calendar.getInstance();
         int y = calendar.get( Calendar.YEAR );
         int m = calendar.get( Calendar.MONTH );
         int d = calendar.get( Calendar.DAY_OF_MONTH );
         int h = calendar.get(Calendar.HOUR_OF_DAY);
         int min = calendar.get(Calendar.MINUTE);
+        Calendar calendarEndTime = Calendar.getInstance();
 
-        mDateButton.setOnClickListener( new View.OnClickListener() {
+        int hEndDate = calendarEndTime.get(Calendar.HOUR_OF_DAY);
+        int minEndDate = calendarEndTime.get(Calendar.MINUTE);
+
+        mDate.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
@@ -154,24 +168,32 @@ public class BookingActivity extends AppCompatActivity implements AdapterView.On
                         calendar.set(Calendar.DAY_OF_MONTH, view.getDayOfMonth());
                         calendar.set(Calendar.MONTH, view.getMonth());
                         calendar.set(Calendar.YEAR, view.getYear());
-                        //récupérer la date de clalendar en milliseconde
-                        datePickedMilli = calendar.getTimeInMillis() ;
-                        duration = Long.parseLong( mDuration.getText().toString() ) * 60 * 1000;
-                        endDatePickedMilli = datePickedMilli + duration ;
+                        calendarEndTime.set(Calendar.DAY_OF_MONTH, view.getDayOfMonth());
+                        calendarEndTime.set(Calendar.MONTH, view.getMonth());
+                        calendarEndTime.set(Calendar.YEAR, view.getYear());
 
-                        datePickedFormated = formatDate( datePickedMilli );
-                        timePickedFormated = formatHour( datePickedMilli );
-                        endTimePickedFormated = formatHour(endDatePickedMilli);
-
-                        mDateButton.setText( datePickedFormated );
-                        mHour.setText(timePickedFormated);
-                        mResumDate.setText( "Date : " + datePickedFormated + " Start : " + timePickedFormated + " End : " + endTimePickedFormated );
+                        initDuration( calendarEndTime, calendar );
                     }
                 };
                 // valorisation de mDatePickerDialog par l'instance de DatePickerDialog avec en paramètre l'activité courrante, le dateSetListner et l'année, le mois et le jour
                 mDatePickerDialog = new DatePickerDialog( BookingActivity.this, dateSetListener, y, m, d );
                 mDatePickerDialog.getDatePicker().setMinDate( new Date().getTime() );
                 mDatePickerDialog.show();
+            }
+        } );
+
+        mDate.addTextChangedListener( new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                dateEdited = true;
+
+                //initDuration( calendarEndTime, calendar );
             }
         } );
 
@@ -184,48 +206,74 @@ public class BookingActivity extends AppCompatActivity implements AdapterView.On
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         calendar.set(Calendar.HOUR_OF_DAY, view.getHour());
                         calendar.set(Calendar.MINUTE, view.getMinute());
-                        datePickedMilli = calendar.getTimeInMillis();
-                        duration = Long.parseLong( mDuration.getText().toString() ) * 60 * 1000;
-                        endDatePickedMilli = datePickedMilli + duration;
-                        timePickedFormated = formatHour( datePickedMilli );
-                        endTimePickedFormated = formatHour(endDatePickedMilli);
-                        mHour.setText( timePickedFormated );
-                        mResumDate.setText( "Date : " + datePickedFormated + " Start : " + timePickedFormated + " End : " + endTimePickedFormated );
+                        initDuration( calendarEndTime, calendar );
                     }
                 };
                 TimePickerDialog timePickerDialog = new TimePickerDialog(BookingActivity.this, timeSetListener, h, min, true);
                 timePickerDialog.show();
             }
         } );
-        //Todo utiliser un textwatcher
-        mDuration.setOnClickListener( new View.OnClickListener() {
+
+        mHour.addTextChangedListener( new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                hourEdited = true;
+
+            }
+        } );
+
+        mEndDate.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String textDuration = mDuration.getText().toString();
-                mDuration.setText( textDuration  );
-                duration = Long.parseLong( textDuration ) * 60L * 1000L;
-                endDatePickedMilli = calendar.getTimeInMillis() + duration;
-                datePickedFormated = formatDate( calendar.getTimeInMillis() );
-                timePickedFormated = formatHour(calendar.getTimeInMillis() );
-                endTimePickedFormated = formatHour( endDatePickedMilli );
-                duration = Long.parseLong( mDuration.getText().toString()) * 60 * 1000;
-                mResumDate.setText( "Date : " + datePickedFormated + " Start : " + timePickedFormated + " End : " + endTimePickedFormated );
+                TimePickerDialog.OnTimeSetListener timeSetListener = new TimePickerDialog.OnTimeSetListener() {
+                    @RequiresApi(api = Build.VERSION_CODES.M)
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        calendarEndTime.set(Calendar.HOUR_OF_DAY, view.getHour());
+                        calendarEndTime.set(Calendar.MINUTE, view.getMinute());
+                        initDuration( calendarEndTime, calendar );
+                        if (duration <= 0) {
+                            Toast.makeText( getApplicationContext(), getApplicationContext().getString(R.string.later_end_date_than_start_date), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                };
+                TimePickerDialog timePickerDialog = new TimePickerDialog(BookingActivity.this, timeSetListener, hEndDate, minEndDate, true);
+                timePickerDialog.show();
+            }
+        });
+        this.mEndDate.addTextChangedListener( new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                   durationEdited = true;
+                   //initDuration( calendarEndTime, calendar );
             }
         } );
     }
 
-    // method for format our dateMillisecond in string with SimpleDateFormat
     public String formatDate(Long dateMilli) {
         String format = "MMM dd.yyyy";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format, Locale.FRANCE);
         return simpleDateFormat.format( dateMilli );
     }
+
     public String formatHour(Long timeMilli) {
         String format = "kk:mm";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format, Locale.FRANCE);
         return simpleDateFormat.format(timeMilli);
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -236,27 +284,93 @@ public class BookingActivity extends AppCompatActivity implements AdapterView.On
         }
         return super.onOptionsItemSelected( item );
     }
-  // Todo : récupérer les valeurs ici + vérifier qu'il n'y ait pas de doublon dans les réunions salle et heure
-  //Todo : améliorer l'interface
-    //Todo : réaliser toute les vérifications ici et envoyer des Toast et mettre le focus sur les champs qui ne sont pas correctes
-  @OnClick(R.id.book)
-    public void setMeetingToBook() {
 
-      Meeting meetingToBook = new Meeting(
-              new Date(datePickedMilli),
-              new Date(endDatePickedMilli),
-              mMeetingRoom.getSelectedItem().toString(),
-              mSubject.getText().toString(),
-              mMail.getText().toString()
-      );
-        mApiService.bookMeeting( meetingToBook );
-        Toast.makeText( this,  "Début : " + formatHour( datePickedMilli  ) + " ; Fin : " + formatHour( endDatePickedMilli ), Toast.LENGTH_SHORT ).show();
-        finish();
+    @OnClick(R.id.book)
+    public void setMeetingToBook() {
+        List<User> userListPicked;
+        String eMailListPicked = mMail.getText().toString();
+        userListPicked = mApiService.getUserListMeeting(eMailListPicked);
+                //mettre un while plutôt qu'un fort lorsqu'on veut utiliser break
+        List<Meeting> meetingList = mApiService.getMeetingList();
+
+        boolean freeRoomCrenel = true;
+        for (Meeting meeting : meetingList) {
+            crenelIsFree = (endDatePickedMilli <= meeting.getDate().getTime() || startDatePickedMilli >= meeting.getEndDate().getTime());
+            roomIsTaken = mMeetingRoom.getSelectedItem().toString().equals( meeting.getRoom().getRoomName() );
+            if(!crenelIsFree && roomIsTaken) {
+                freeRoomCrenel = false;
+                break;
+            }
+        }
+        if (!dateEdited) {
+            mDate.requestFocus();
+            Toast.makeText(this, getApplicationContext().getString(R.string.date_not_eddited), Toast.LENGTH_SHORT).show();
+        } else if (!hourEdited) {
+            mHour.requestFocus();
+            Toast.makeText(this, getApplicationContext().getString(R.string.hour_not_eddited), Toast.LENGTH_SHORT).show();
+        } else if (!durationEdited){
+            mEndDate.requestFocus();
+            Toast.makeText(this, getApplicationContext().getString(R.string.end_date_not_eddited), Toast.LENGTH_SHORT).show();
+        } else if (!mailEdited ) {
+            mMail.requestFocus();
+            Toast.makeText( this, getApplicationContext().getString( R.string.mail_not_eddited ), Toast.LENGTH_SHORT ).show();
+        } else if(userListPicked == null) {
+            mMail.requestFocus();
+            Toast.makeText( this, "You have to select existing user", Toast.LENGTH_SHORT ).show();
+        } else if (!subjectEdited) {
+            mSubject.requestFocus();
+            Toast.makeText(this, getApplicationContext().getString(R.string.subject_not_eddited), Toast.LENGTH_SHORT).show();
+        } else if (endDatePickedMilli - startDatePickedMilli <= 0) {
+            mEndDate.requestFocus();
+            Toast.makeText( this, getApplicationContext().getString(R.string.later_end_date_than_start_date), Toast.LENGTH_SHORT ).show();
+        } else if (mMeetingRoom.getSelectedItem().toString() == "Chose room") {
+            mMeetingRoom.requestFocus();
+            Toast.makeText( this, getApplicationContext().getString(R.string.meeting_room_not_eddited), Toast.LENGTH_SHORT ).show();
+        } else if (!freeRoomCrenel) {
+            Toast.makeText( this, "Pick an other room", Toast.LENGTH_SHORT ).show();
+            mMeetingRoom.requestFocus();
+        }
+         else {
+            Meeting meetingToBook = new Meeting(
+                    new Date( startDatePickedMilli ),
+                    new Date(endDatePickedMilli),
+                    new Room (mMeetingRoom.getSelectedItemPosition(), mMeetingRoom.getSelectedItem().toString()),
+                    //(mMeetingRoom.getSelectedItemId() ne marche pas)
+                    mSubject.getText().toString(),
+                    userListPicked, false
+            );
+            mApiService.bookMeeting( meetingToBook );
+            Toast.makeText( this,    " Date : " + formatDate(startDatePickedMilli) + " ; Start : " + formatHour( startDatePickedMilli ) + " ; End : " + formatHour( endDatePickedMilli ), Toast.LENGTH_SHORT ).show();
+            finish();
+      }
     }
+
     public static void navigate(FragmentActivity activity) {
         Intent intent = new Intent(activity, BookingActivity.class);
         ActivityCompat.startActivity(activity, intent, null);
     }
+
+    public void initDuration(Calendar calendarEndTime, Calendar calendar) {
+        startDatePickedMilli = calendar.getTimeInMillis();
+        endDatePickedMilli = calendarEndTime.getTimeInMillis();
+
+        datePickedFormated = formatDate( startDatePickedMilli );
+        timePickedFormated = formatHour( startDatePickedMilli );
+        endTimePickedFormated = formatHour( endDatePickedMilli );
+
+        duration = (endDatePickedMilli - startDatePickedMilli) / 60 / 1000;
+        String textDuration = duration.toString();
+
+        mDate.setText( datePickedFormated );
+        mHour.setText(timePickedFormated);
+        mEndDate.setText(endTimePickedFormated);
+
+        if (duration <= 0) {
+            textDuration = getApplicationContext().getString( R.string.error );
+        }
+        mResumDate.setText( "Date : " + datePickedFormated + " Start : " + timePickedFormated + " End : " + endTimePickedFormated + "           Time : " + textDuration );
+    }
+
 
 
     @Override
@@ -268,4 +382,25 @@ public class BookingActivity extends AppCompatActivity implements AdapterView.On
     public void onNothingSelected(AdapterView<?> parent) {
 
     }
+    // Mettre à jour la liste du spinner ou indiquer à l'utilisateur les salles disponiblent au crénau choisi
+
+    //public void removeRoomSpinner (String room) {
+
+    //    meetingRoomArrayList.remove(room);
+
+    //}
+    //public void updateSpinner() {
+    //List<Meeting> meetingList = mApiService.getMeetingList();
+
+    //    for (Meeting meeting : meetingList) {
+    //        //crenelIsFree = (endDatePickedMilli <= meeting.getDate().getTime() || startDatePickedMilli >= meeting.getEndDate().getTime());
+    //        //roomIsTaken = mMeetingRoom.getSelectedItem().toString().equals( meeting.getPlace() );
+    //        boolean crenelIsNotFree = (meeting.getDate().getTime() <= endDatePickedMilli && meeting.getEndDate().getTime() >= startDatePickedMilli  );
+    //        if (crenelIsNotFree) {
+    //            removeRoomSpinner( meeting.getPlace() );
+    //        }
+    //    }
+    //}
+   // boolean crenelIsNotFree = (meeting.getDate().getTime() <= endDatePickedMilli && meeting.getEndDate().getTime() >= startDatePickedMilli  );
+
 }

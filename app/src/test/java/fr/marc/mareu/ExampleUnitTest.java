@@ -9,6 +9,8 @@ import static org.junit.Assert.*;
  *
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
+//recopier ce qu'il y a dans le projet 3
+
 public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() {
