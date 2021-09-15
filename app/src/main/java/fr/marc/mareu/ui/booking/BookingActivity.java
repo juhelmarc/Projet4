@@ -77,13 +77,13 @@ public class BookingActivity extends AppCompatActivity implements AdapterView.On
 
     private DatePickerDialog mDatePickerDialog;
 
-    private Boolean dateEdited;
-    private Boolean hourEdited;
-    private Boolean durationEdited;
-    private Boolean mailEdited;
-    private Boolean subjectEdited;
-    private Boolean roomIsTaken;
-    private Boolean crenelIsFree;
+    private boolean dateEdited;
+    private boolean hourEdited;
+    private boolean durationEdited;
+    private boolean mailEdited;
+    private boolean subjectEdited;
+    private boolean roomIsTaken;
+    private boolean crenelIsFree;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -291,16 +291,20 @@ public class BookingActivity extends AppCompatActivity implements AdapterView.On
         String eMailListPicked = mMail.getText().toString();
         userListPicked = mApiService.getUserListMeeting(eMailListPicked);
                 //mettre un while plutôt qu'un fort lorsqu'on veut utiliser break
-        List<Meeting> meetingList = mApiService.getMeetingList();
+        List<Meeting> meetingList = mApiService.getMeetingList(false);
+
 
         boolean freeRoomCrenel = true;
-        for (Meeting meeting : meetingList) {
-            crenelIsFree = (endDatePickedMilli <= meeting.getDate().getTime() || startDatePickedMilli >= meeting.getEndDate().getTime());
-            roomIsTaken = mMeetingRoom.getSelectedItem().toString().equals( meeting.getRoom().getRoomName() );
-            if(!crenelIsFree && roomIsTaken) {
-                freeRoomCrenel = false;
-                break;
-            }
+        if(endDatePickedMilli != null && startDatePickedMilli != null && mMeetingRoom != null) {
+            do {
+                for (Meeting meeting : meetingList) {
+                    crenelIsFree = (endDatePickedMilli <= meeting.getDate().getTime() || startDatePickedMilli >= meeting.getEndDate().getTime());
+                    roomIsTaken = mMeetingRoom.getSelectedItem().toString().equals( meeting.getRoom().getRoomName() );
+                    if (!crenelIsFree && roomIsTaken) {
+                        freeRoomCrenel = false;
+                    }
+                }
+            } while (!crenelIsFree && roomIsTaken);
         }
         if (!dateEdited) {
             mDate.requestFocus();
@@ -326,7 +330,8 @@ public class BookingActivity extends AppCompatActivity implements AdapterView.On
         } else if (mMeetingRoom.getSelectedItem().toString() == "Chose room") {
             mMeetingRoom.requestFocus();
             Toast.makeText( this, getApplicationContext().getString(R.string.meeting_room_not_eddited), Toast.LENGTH_SHORT ).show();
-        } else if (!freeRoomCrenel) {
+        }
+        else if (!freeRoomCrenel) {
             Toast.makeText( this, "Pick an other room", Toast.LENGTH_SHORT ).show();
             mMeetingRoom.requestFocus();
         }

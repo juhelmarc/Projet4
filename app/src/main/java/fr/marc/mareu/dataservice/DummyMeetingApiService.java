@@ -1,10 +1,12 @@
 package fr.marc.mareu.dataservice;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import fr.marc.mareu.model.Meeting;
 import fr.marc.mareu.model.Room;
@@ -20,10 +22,20 @@ public class DummyMeetingApiService implements MeetingApiService {
 
 
     @Override
-    public List<Meeting> getMeetingList() {
-        return meetingList;
-    }
+    public List<Meeting> getMeetingList(boolean isFiltered) {
+        List<Meeting> filteredMeetingList = new ArrayList<>();
+        if(isFiltered){
+            for(Meeting meeting : meetingList) {
+                if(meeting.getFiltered() == true) {
+                    filteredMeetingList.add(meeting);
+                }
+            }
+            return filteredMeetingList;
+        } else {
+            return meetingList;
+        }
 
+    }
     @Override
     public void deleteMeeting(Meeting meeting) {
         meetingList.remove(meeting);
@@ -72,17 +84,6 @@ public class DummyMeetingApiService implements MeetingApiService {
 //créer méthode pour maj la liste en focntion des filtres
 
     @Override
-    public List<Meeting> getMeetingListFiltered() {
-        List<Meeting> filteredMeetingList = new ArrayList<>();
-        for(Meeting meeting : meetingList) {
-            if(meeting.getFiltered()){
-                filteredMeetingList.add(meeting);
-            }
-        }
-        return filteredMeetingList;
-    }
-
-    @Override
     public List<String> getRoomNameList() {
         List<String> roomNameList = new ArrayList<>();
         for(Room room : roomList) {
@@ -92,22 +93,25 @@ public class DummyMeetingApiService implements MeetingApiService {
     }
 
     @Override
-    public void applyRoomFilter(int index) {
-        Room roomPicked = getRoomList().get( index );
-        for(Meeting meeting : meetingList) {
-            if(roomPicked == meeting.getRoom()) {
-                meeting.setFiltered( true );
-            } else {
-                meeting.setFiltered( false );
+    public void applyRoomFilter(String room) {
+        if(room != null) {
+            for (Meeting meeting : meetingList) {
+                if(meeting.getRoom().getRoomName().equals( room )) {
+                    meeting.setFiltered( true );
+                } else {
+                    meeting.setFiltered( false );
+                }
             }
         }
-
-
     }
     @Override
-    public void  applyDateFilter(Date date) {
+    public void  applyDateFilter(String formatDate) {
+        String format = "MMM dd.yyyy";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format, Locale.FRANCE);
+
         for(Meeting meeting : meetingList)
-            if(meeting.getDate().after( date )) {
+            if(simpleDateFormat.format( meeting.getDate().getTime() ).equals( formatDate )) {
+            //if(simpleDateFormat.format( meeting.getDate().getTime() ).equals( simpleDateFormat.format( date.getTime() ) )) {
                meeting.setFiltered( true );
         } else {
                 meeting.setFiltered( false );
