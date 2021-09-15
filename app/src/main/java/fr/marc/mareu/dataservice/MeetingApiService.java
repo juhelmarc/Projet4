@@ -9,7 +9,7 @@ import fr.marc.mareu.model.User;
 
 public interface MeetingApiService {
 
-    List<Meeting> getMeetingList();
+    List<Meeting> getMeetingList(boolean isFiltered);
 
     void deleteMeeting(Meeting meeting);
 
@@ -21,14 +21,14 @@ public interface MeetingApiService {
 
     List<User> getUserListMeeting (String emailList);
 
-    List<Meeting> getMeetingListFiltered();
+
 
     List<Room> getRoomList();
 
     List <String> getRoomNameList();
 
-    void applyRoomFilter(int index);
+    void applyRoomFilter(String room);
 
-    void applyDateFilter(Date date);
+    void applyDateFilter(String formatDate);
 
 }

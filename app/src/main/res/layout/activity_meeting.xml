@@ -24,7 +24,8 @@
             app:menu="@menu/menu_filter"
             app:layout_constraintTop_toTopOf="parent"
             app:title="@string/app_name"
-            app:titleTextColor="@color/white" />
+            app:titleTextColor="@color/white"
+            />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.recyclerview.widget.RecyclerView
